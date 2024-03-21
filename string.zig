@@ -128,7 +128,7 @@ test "string" {
     string.description();
 
     try std.testing.expect(string.equalTo("Hello world foo bar"));
-  
+
     try std.testing.expect(string.hasPrefix("Hello"));
     try std.testing.expect(string.contains("foo"));
     try std.testing.expect(!string.contains("what"));

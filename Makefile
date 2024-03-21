@@ -30,4 +30,5 @@ run:
 	zig run string.zig
 
 test:
-	zig test string.zig
+	zig test string.zig 
+	zig test date.zig
