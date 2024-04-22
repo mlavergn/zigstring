@@ -20,6 +20,9 @@ setup:
 build:
 	zig build
 
+clean:
+	rm -rf zig-cache zig-build
+
 format:
 	zig fmt *.zig
 

@@ -23,7 +23,7 @@ pub const Date = struct {
 };
 
 test "date" {
-    var allocator = std.testing.allocator;
+    const allocator = std.testing.allocator;
     var date = try Date.init(allocator);
     date.description();
 }

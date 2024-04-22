@@ -67,7 +67,7 @@ pub const String = struct {
             const slice = try self.allocator.dupe(u8, value);
             self._ = slice;
         } else {
-            std.mem.copy(u8, self._, value);
+            std.mem.copyForwards(u8, self._, value);
             _ = self.allocator.resize(self._, value.len);
             self._.len = value.len;
         }
@@ -82,22 +82,28 @@ pub const String = struct {
     pub fn append(self: *String, value: []const u8) !void {
         const len = self._.len + value.len;
         const result = try self.allocator.alloc(u8, len);
-        std.mem.copy(u8, result, self._);
-        std.mem.copy(u8, result[self._.len..], value);
+        std.mem.copyForwards(u8, result, self._);
+        std.mem.copyForwards(u8, result[self._.len..], value);
         self.allocator.free(self._);
         self._ = result;
     }
 
+    /// Rewrite the string to a reversed representation
+    /// NOTE: Not multi-byte char safe
     pub fn reverse(self: String) void {
         std.mem.reverse(u8, self._[0..self._.len]);
     }
 
+    /// Rewrite the string to an all lower-case representation
+    /// NOTE: Currently only aupports ASCII use cases
     pub fn lowercased(self: *String) !void {
         for (self._, 0..) |ch, i| {
             self._[i] = if (ch >= 'A' and ch <= 'Z') ch + 32 else ch;
         }
     }
 
+    /// Rewrite the string to an all upper-case representation
+    /// NOTE: Currently only aupports ASCII use cases
     pub fn uppercased(self: *String) !void {
         for (self._, 0..) |ch, i| {
             self._[i] = if (ch >= 'a' and ch <= 'z') ch - 32 else ch;
@@ -107,7 +113,7 @@ pub const String = struct {
 
 test "string" {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-    var allocator = gpa.allocator();
+    const allocator = gpa.allocator();
     // var allocator = std.testing.allocator;
     var string = try String.init(allocator, "Hello world");
     string.description();
@@ -118,7 +124,7 @@ test "string" {
     try std.testing.expectEqualStrings("dlrow olleH", string.string());
     string.description();
 
-    var expect = "Hello world foo";
+    const expect = "Hello world foo";
     try string.set(expect);
     try std.testing.expectEqualStrings(expect, string.string());
     string.description();
